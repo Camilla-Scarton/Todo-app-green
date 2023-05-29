@@ -3,19 +3,17 @@ import CustomForm from "./components/CustomForm";
 import TodosList from "./components/TodosList";
 import EditForm from "./components/EditForm";
 import useLocalStorage from "./hooks/useLocalStorage";
+import ConfirmForm from "./components/ConfirmForm";
 
 function App() {
   const [todos, setTodos] = useLocalStorage("react-todo.todos", [{name: "Sooo empty", id: 0, checked: false}]);
   const [editedTodo, setEditedTodo] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [previousFocusEl, setPreviousFocusEl] = useState(null);
+  const [isConfirmation, setIsConfirmation] = useState(false);
 
   function addTodo(todo) {
     setTodos((todos) => [todo, ...todos]);
-  }
-
-  function deleteTodo(id) {
-    setTodos((todos) => todos.filter((todo) => todo.id !== id));
   }
 
   function toggleTodo(id) {
@@ -44,9 +42,25 @@ function App() {
     previousFocusEl.focus();
   }
 
+  function deleteTodo(id) {
+    setTodos((todos) => todos.filter((todo) => todo.id !== id));
+    closeConfirmMode();
+  }
+
+  function enterConfirmMode(todo) {
+    setEditedTodo(todo);
+    setIsConfirmation(true);
+    setPreviousFocusEl(document.activeElement);
+  }
+
+  function closeConfirmMode() {
+    setIsConfirmation(false);
+    previousFocusEl.focus();
+  }
+
   return (
-    <div className="min-h-[100vh] flex flex-col gap-4 bg-green-400 text-center p-4">
-      <header className="text-white text-4xl my-3 hover:text-green-800 hover:cursor-default">
+    <div className="max-w-[100vw] min-h-[100vh] flex flex-col gap-3 md:gap-4 bg-green-400 text-center p-4">
+      <header className="text-white text-2xl md:text-4xl my-1 md:my-3 hover:text-green-800 hover:cursor-default">
         <h1>My Todos List</h1>
       </header>
       {isEditing && (
@@ -56,11 +70,18 @@ function App() {
           closeEditMode={closeEditMode}
         />
       )}
+      {isConfirmation && (
+        <ConfirmForm 
+          editedTodo={editedTodo}
+          deleteTodo={deleteTodo}
+          closeConfirmMode={closeConfirmMode}
+        />
+      )}
       <CustomForm addTodo={addTodo} />
       {todos && (
         <TodosList
           todos={todos}
-          deleteTodo={deleteTodo}
+          enterConfirmMode={enterConfirmMode}
           toggleTodo={toggleTodo}
           enterEditMode={enterEditMode}
         />

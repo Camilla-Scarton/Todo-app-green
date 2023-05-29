@@ -30,7 +30,7 @@ const CustomForm = ({ addTodo }) => {
           className="max-w-[90%] input px-2 rounded focus:ring focus:outline-none focus:ring-green-900 placeholder:text-green-600"
           placeholder="New todo"
           value={todo}
-          maxLength={60}
+          maxLength={200}
           onInput={handleInput}
           required
           autoFocus
